@@ -23,11 +23,32 @@ import { useEffect, useRef, useState } from "react";
 const AboutUs = () => {
   const [active, setActive] = useState(0);
   const contentRef = useRef<HTMLDivElement>(null);
+  const hasMounted = useRef(false);
+
   useEffect(() => {
-    if (window.innerWidth < 768 && contentRef.current) {
+    if (!hasMounted.current) {
+      hasMounted.current = true;
+      return;
+    }
+
+    if (window.innerWidth < 768 && contentRef.current && active !== 0) {
       contentRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   }, [active]);
+
+  const handleClick = (idx: number) => {
+    if (idx === active) {
+      // If same item is clicked, manually scroll
+      if (window.innerWidth < 768 && contentRef.current) {
+        contentRef.current.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }
+    } else {
+      setActive(idx);
+    }
+  };
 
   const services = [
     {
@@ -245,7 +266,7 @@ const AboutUs = () => {
                 {services.map((s, idx) => (
                   <button
                     key={idx}
-                    onClick={() => setActive(idx)}
+                    onClick={() => handleClick(idx)}
                     className={`w-full border-b-0 text-left p-4 text-lg font-medium transition-all duration-200 hover:bg-gray-50 ${
                       active === idx
                         ? "border-l-4  border-green-700 bg-gray-50 text-green-700"
